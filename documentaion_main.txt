@@ -1,0 +1,121 @@
+Here is the modified code with meaningful comments and docstrings:
+
+```Python
+import random
+from selenium import webdriver
+from selenium.common import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+import os
+import time
+from selenium.webdriver.support.wait import WebDriverWait
+
+def start_chrom():
+    """
+    This function starts a chrome browser instance and navigates to Google Drive.
+    It then logs in to the account and uploads a random video file.
+    """
+    chrome_option = webdriver.ChromeOptions()
+    # chrome_option.add_argument('--incognito')  # Uncomment to start in incognito mode
+    chrome_option.add_experimental_option("detach", True)  # Keep the browser open after the script finishes
+    driver_path = "C:\Drivers\chromedriver.exe"  # Path to the chromedriver executable
+    service = Service(executable_path=driver_path)
+    service.start()
+
+    driver = webdriver.Chrome(service=service, options=chrome_option)
+    driver.get("https://www.google.com/drive/")  # Navigate to Google Drive
+    time.sleep(5)  # Wait for the page to load
+    driver.maximize_window()  # Maximize the browser window
+    driver.find_element(By.LINK_TEXT, "Sign in").click()  # Click the sign in button
+    new_window = driver.window_handles[-1]  # Switch to the new window
+    driver.switch_to.window(new_window)
+    driver.find_element(By.ID, "identifierId").click()  # Click the email input field
+    driver.find_element(By.ID, "identifierId").send_keys("idhilied@gmail.com")  # Enter the email
+    time.sleep(5)  # Wait for the next page to load
+    driver.find_element(By.ID, "identifierNext").click()  # Click the next button
+    time.sleep(5)  # Wait for the password page to load
+
+    time.sleep(5)  # Wait for the password page to load
+    driver.find_element(By.ID, "initialView").click()  # Click the password input field
+    driver.find_element(By.NAME, "Passwd").send_keys("test2023")  # Enter the password
+    time.sleep(5)  # Wait for the next page to load
+    driver.find_element(By.ID, "passwordNext").click()  # Click the next button
+
+    wait = WebDriverWait(driver, 10)  # Create a wait object
+    element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[guidedhelpid="new_menu_button"]')))  # Wait for the new button to be clickable
+    element.click()  # Click the new button
+    # NOTE: TO INSPECT A DISAPPEARING ELEMENT, KEEP PRESSING ON CTRL+SHIFT+C AND TRIGGER THIS ELEMENT TO SHOW THEN MOVE YOUR MOUSE TO THE ELEMENT U WANT TO INSPECT
+    element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,'div[data-tooltip="File upload"]')))  # Wait for the file upload button to be clickable
+    element.click()  # Click the file upload button
+    # Upload a file randomly
+    fileinput = driver.find_element(By.XPATH, "/html/body/input[2]")  # Find the file input field
+    video_names = ['automation-deyar.mp4', 'testim-deyar.mp4', 'video1241937557.mp4',
+                   'video1263108396.mp4','video1733716221.mp4','video1741500942.mp4',
+                   'video1776593192.mp4','video2692176599.mp4']  # List of video files to choose from
+    video_path = "C:/Users/dell/Documents/Zoom/videos"  # Path to the video files
+    name = random.choice(video_names)  # Choose a random video file
+    video_file = os.path.join(video_path, name)  # Get the full path of the video file
+    print(video_file)  # Print the video file path
+    fileinput.send_keys(video_file)  # Upload the video file
+    time.sleep(5)  # Wait for the upload to complete
+    # Either the file is already uploaded or it's the first time
+    try:
+        # Element is the popup that asks to replace the old with the new one, to keep both, or to cancel
+        # If element is displayed then it's not the first time to upload this file
+        # What will happen? : replace then upload
+        element = driver.find_element(By.CSS_SELECTOR,
+                                      "body > div.ZACE2c.vMI2nb.dif24c.vhoiae.KkxPLb.eO2Zfd > div.xmQMab > div > div > div")
+        if element.is_displayed():
+            print("replace")
+            driver.find_element(By.CSS_SELECTOR,
+                                "body > div.ZACE2c.vMI2nb.dif24c.vhoiae.KkxPLb.eO2Zfd > div.xmQMab > div > div > div > div > div.OsLnq.IRlIld > div:nth-child(2) > button").click()
+        else:
+            print("new file")
+
+    except NoSuchElementException:
+        print("The file is new")
+
+    quit_chrome(driver)  # Quit the browser
+
+
+def quit_chrome(driver):
+    """
+    This function quits the chrome browser instance.
+    """
+    driver.quit()
+
+
+if __name__ == '__main__':
+    start_chrom()
+```
+
+Here is the documentation:
+
+**Summary of Libraries Used:**
+
+* `selenium`: This library is used to automate web browsers. It is used to start a chrome browser instance, navigate to Google Drive, log in to the account, and upload a video file.
+* `random`: This library is used to choose a random video file to upload.
+* `os`: This library is used to get the full path of the video file.
+* `time`: This library is used to wait for pages to load and for the upload to complete.
+
+**Modifications Necessary to Run the Code on Your Device:**
+
+* You need to have the chromedriver executable installed on your device. You can download it from the official chromedriver website.
+* You need to replace the `driver_path` variable with the path to the chromedriver executable on your device.
+* You need to replace the `video_path` variable with the path to the video files on your device.
+* You need to replace the email and password in the script with your own Google account credentials.
+
+**Data Used for Testing:**
+
+* The script uses a list of video files to choose from. You can replace this list with your own video files.
+* The script uses a Google account to log in to Google Drive. You can replace the email and password with your own Google account credentials.
+
+**Summary of the Code's Functionality:**
+
+* The script starts a chrome browser instance and navigates to Google Drive.
+* It logs in to the account using the provided email and password.
+* It uploads a random video file from the list of video files.
+* If the file is already uploaded, it replaces the old file with the new one.
+* Finally, it quits the browser instance.
