@@ -1,0 +1,174 @@
+Here is the refactored code:
+
+```Python
+import random
+from selenium import webdriver
+from selenium.common import NoSuchElementException
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+import os
+import time
+from selenium.webdriver.support.wait import WebDriverWait
+
+def start_chrome():
+    """
+    Start a chrome browser instance.
+    """
+    driver = initialize_chrome()
+    navigate_to_google_drive(driver)
+    return driver
+
+def initialize_chrome():
+    """
+    Initialize the chrome driver.
+    """
+    chrome_option = webdriver.ChromeOptions()
+    chrome_option.add_experimental_option("detach", True)
+    driver_path = "C:\Drivers\chromedriver.exe"
+    service = Service(executable_path=driver_path)
+    service.start()
+    driver = webdriver.Chrome(service=service, options=chrome_option)
+    return driver
+
+def navigate_to_google_drive(driver):
+    """
+    Navigate to Google Drive.
+    """
+    driver.get("https://www.google.com/drive/")
+    time.sleep(5)
+    driver.maximize_window()
+    time.sleep(5)
+
+def sign_in_google_drive(driver):
+    """
+    Sign in to Google Drive.
+    """
+    sign_in = driver.find_element(By.LINK_TEXT, "Sign in")
+    time.sleep(5)
+    sign_in.click()
+    new_window = driver.window_handles[-1]
+    driver.switch_to.window(new_window)
+    driver.find_element(By.ID, "identifierId").click()
+    driver.find_element(By.ID, "identifierId").send_keys("idhilied@gmail.com")
+    time.sleep(5)
+    driver.find_element(By.ID, "identifierNext").click()
+    time.sleep(5)
+    driver.find_element(By.ID, "initialView").click()
+    driver.find_element(By.NAME, "Passwd").send_keys("test2023")
+    time.sleep(5)
+    driver.find_element(By.ID, "passwordNext").click()
+
+def wait_for_element_to_load(driver):
+    """
+    Wait for the Google Drive page to load.
+    """
+    wait = WebDriverWait(driver, 10)
+    element = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#\:5 > div > c-wiz > div:nth-child(3) > c-wiz > div > div.zCNSJd')))
+
+def open_video(driver):
+    """
+    Open a video on Google Drive.
+    """
+    video = driver.find_element(By.CSS_SELECTOR,".Ccie2c:nth-child(1) .l-u-Ab-zb-ma-za")
+    action = ActionChains(driver)
+    action.perform()
+    time.sleep(30)
+    iframe = driver.find_element(By.CSS_SELECTOR, "#drive-viewer-video-player-object-0")
+    driver.switch_to.frame(iframe)
+
+def play_and_stop_video(driver):
+    """
+    Play and stop the video after a minute.
+    """
+    video = driver.find_element(By.TAG_NAME, "video")
+    video_current_time = 0
+    is_stopped = False
+    video_current_time = video.get_property('currentTime')
+    if video_current_time == 0:
+        print("video hasn't started yet, check your internet connection")
+    elif video_current_time > 0:
+        print("video has started playing")
+    for i in range(60):
+        print("i= ",i)
+        time.sleep(1)
+        video_current_time = video.get_property('currentTime')
+        if video_current_time == 0:
+            print("video hasn't started yet, check your internet connection")
+        elif video_current_time >= 60:
+            driver.execute_script("arguments[0].pause();", video)
+            print("video was stopped at: ", video_current_time)
+            is_stopped = True
+            break
+    if is_stopped == False:
+        print("video forced to stop at: ", video_current_time)
+
+def go_back_to_previous_page(driver):
+    """
+    Go back to the previous page.
+    """
+    driver.switch_to.default_content()
+    element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "Yk-hj-S"))
+    )
+    ActionChains(driver).move_to_element(element).perform()
+    back_arrow = driver.find_element(By.CSS_SELECTOR, 'div[data-tooltip="Close"]')
+    back_arrow.click()
+
+def quit_chrome(driver):
+    """
+    Quit the chrome browser instance.
+    """
+    driver.quit()
+
+if __name__ == '__main__':
+    driver = start_chrome()
+    sign_in_google_drive(driver)
+    wait_for_element_to_load(driver)
+    open_video(driver)
+    play_and_stop_video(driver)
+    go_back_to_previous_page(driver)
+    quit_chrome(driver)
+```
+
+**Documentation**
+
+**Libraries Used**
+
+The code uses the following libraries:
+
+* `selenium`: This is a browser automation library. It is used to automate the browser actions like navigating to a webpage, clicking on buttons, filling out forms, etc.
+* `random`: This library is not used in the code.
+* `os`: This library is not used in the code.
+* `time`: This library is used to add delays between actions.
+
+**Modifications necessary to run the code**
+
+To run the code, you need to have the following:
+
+* Google Chrome browser installed on your device.
+* The chromedriver executable should be in the path specified in the code (`C:\Drivers\chromedriver.exe`).
+* A Google account to sign in to Google Drive.
+* A video uploaded to Google Drive.
+
+**Data used for testing**
+
+The code uses the following data for testing:
+
+* A Google account email and password.
+* A video uploaded to Google Drive.
+
+**Summary of the code's functionality**
+
+The code automates the following actions:
+
+* Start a chrome browser instance.
+* Navigate to Google Drive.
+* Sign in to Google Drive.
+* Wait for the Google Drive page to load.
+* Open a video on Google Drive.
+* Play the video and stop it after a minute.
+* Go back to the previous page.
+* Quit the chrome browser instance.
